@@ -15,14 +15,7 @@ export class UserController {
   @ApiResponse({ status: 201, description: 'User created successfully' })
   @ApiResponse({ status: 400, description: 'Incorrect Input' })
 
-  @UsePipes(new ValidationPipe({
-    transform: true, // Automatically transform payload into DTO instances
-    exceptionFactory: (errors) => {
-      // Custom error message handling
-      const messages = errors.map(error => `${error.property} has wrong value ${error.value}. ${Object.values(error.constraints).join(', ')}`).join('; ');
-      throw new BadRequestException(messages);
-    }
-  }))
+  @UsePipes(new ValidationPipe())  // Validation of request body and param
   create(@Body() createUserDto: CreateUserDto) {
     return this.userService.create(createUserDto);
   }
@@ -39,12 +32,9 @@ export class UserController {
 
   @ApiResponse({ status: 200, description: 'Returns a single user' })
   @ApiResponse({ status: 404, description: 'User not found' })
+  @ApiResponse({ status: 400, description: 'Incorrect ID format' })
 
-  @UsePipes(new ValidationPipe({
-    exceptionFactory: (errors) => {
-      throw new BadRequestException('Invalid ID format');
-    }
-  }))
+  @UsePipes(new ValidationPipe())  // Validation of request body and param
   findOne(@Param() params: CheckUUID) {
     const { id } = params;
     return this.userService.findOne(id);
