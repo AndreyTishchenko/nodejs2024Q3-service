@@ -58,7 +58,7 @@ export class ArtistService {
     // Delete the artist from tracks and albums
     this.trackService.removeArtistFromTracks(id);
     this.albumService.removeArtistFromAlbums(id);
-    // this.favoritesService.removeArtistFromFavorites(id);
+    this.favoritesService.removeArtistFromFavorites(id);
 
     // Remove the artist from the list
     this.artists.splice(artistIndex, 1);

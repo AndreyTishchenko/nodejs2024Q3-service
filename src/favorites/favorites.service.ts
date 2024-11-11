@@ -1,5 +1,5 @@
 // src/favorites/favorites.service.ts
-import { forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
 import { AddTrackToFavoritesDto } from './dto/add-to-favorites.dto';
 import { AddAlbumToFavoritesDto } from './dto/add-to-favorites.dto';
 import { AddArtistToFavoritesDto } from './dto/add-to-favorites.dto';
@@ -32,8 +32,20 @@ export class FavoritesService {
 
   // Add track to global favorites
   addTrackToFavorites(trackId: string) {
-    const track = this.trackService.findOne(trackId);
+    let track;
 
+    try {
+      track = this.trackService.findOne(trackId);  // Assuming `findOne` may throw 404
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new UnprocessableEntityException(`Track with id ${trackId} does not exist`);
+      }
+      throw error;
+    }
+
+    if (!track) {
+      throw new UnprocessableEntityException(`Track with id ${trackId} not found`);
+    }
     // Check if the track is already in favorites
     if (this.globalFavorites.tracks.includes(track.id)) {
       throw new NotFoundException(`Track with id ${track.id} is already in global favorites`);
@@ -44,19 +56,34 @@ export class FavoritesService {
   }
 
   // Remove track from global favorites
-  removeTrackFromFavorites(trackId: string) {
+  removeTrackFromFavorites(trackId: string, fromRequest: boolean = false) {
     const trackIndex = this.globalFavorites.tracks.indexOf(trackId);
-    if (trackIndex === -1) {
-      throw new NotFoundException(`Track with id ${trackId} is not in global favorites`);
+    if (fromRequest === false) {
+      if (trackIndex !== -1) {
+        this.globalFavorites.tracks.splice(trackIndex, 1);
+      }
+    }else if (fromRequest === true) {
+      if (trackIndex === -1) {
+        throw new NotFoundException(`Track with id ${trackId} is not in global favorites`);
+      }
+      this.globalFavorites.tracks.splice(trackIndex, 1);
     }
 
-    this.globalFavorites.tracks.splice(trackIndex, 1);
+
   }
 
   // Add album to global favorites
   addAlbumToFavorites(albumId: string) {
-    const album = this.albumService.findOne(albumId);
-
+    let album;
+    
+    try {
+      album = this.albumService.findOne(albumId);  // Assuming `findOne` may throw 404
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new UnprocessableEntityException(`Album with id ${albumId} does not exist`);
+      }
+      throw error;
+    }
     // Check if the album is already in favorites
     if (this.globalFavorites.albums.includes(album.id)) {
       throw new NotFoundException(`Album with id ${album.id} is already in global favorites`);
@@ -67,19 +94,36 @@ export class FavoritesService {
   }
 
   // Remove album from global favorites
-  removeAlbumFromFavorites(albumId: string) {
+  removeAlbumFromFavorites(albumId: string, fromRequest: boolean = false) {
     const albumIndex = this.globalFavorites.albums.indexOf(albumId);
-    if (albumIndex === -1) {
-      throw new NotFoundException(`Album with id ${albumId} is not in global favorites`);
+    if (fromRequest === false) {
+      if (albumIndex !== -1) {
+        this.globalFavorites.albums.splice(albumIndex, 1);
+      }
+    }else if (fromRequest === true) {
+      if (albumIndex === -1) {
+        throw new NotFoundException(`Album with id ${albumId} is not in global favorites`);
+      }
+      this.globalFavorites.albums.splice(albumIndex, 1);
     }
-
-    this.globalFavorites.albums.splice(albumIndex, 1);
   }
 
   // Add artist to global favorites
   addArtistToFavorites(artistId: string) {
-    const artist = this.artistService.findOne(artistId);
+    let artist;
 
+    try {
+      artist = this.artistService.findOne(artistId);  // Assuming `findOne` may throw 404
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new UnprocessableEntityException(`Artist with id ${artistId} does not exist`);
+      }
+      throw error;  // Re-throw other errors
+    }
+
+    if (!artist) {
+      throw new UnprocessableEntityException(`Track with id ${artistId} not found`);
+    }
     // Check if the artist is already in favorites
     if (this.globalFavorites.artists.includes(artist.id)) {
       throw new NotFoundException(`Artist with id ${artist.id} is already in global favorites`);
@@ -90,12 +134,17 @@ export class FavoritesService {
   }
 
   // Remove artist from global favorites
-  removeArtistFromFavorites(artistId: string) {
+  removeArtistFromFavorites(artistId: string, fromRequest: boolean = false) {
     const artistIndex = this.globalFavorites.artists.indexOf(artistId);
-    if (artistIndex === -1) {
-      throw new NotFoundException(`Artist with id ${artistId} is not in global favorites`);
+    if (fromRequest === false) {
+      if (artistIndex !== -1) {
+        this.globalFavorites.artists.splice(artistIndex, 1);
+      }
+    }else if (fromRequest === true) {
+      if (artistIndex === -1) {
+        throw new NotFoundException(`Artist with id ${artistId} is not in global favorites`);
+      }
+      this.globalFavorites.artists.splice(artistIndex, 1);
     }
-
-    this.globalFavorites.artists.splice(artistIndex, 1);
   }
 }

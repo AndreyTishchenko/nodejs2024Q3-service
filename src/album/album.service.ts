@@ -52,7 +52,7 @@ export class AlbumService {
     this.trackService.removeAlbumFromTracks(id);
 
     // Remove album from favorites
-    // this.favoritesService.removeAlbumFromFavorites(id);
+    this.favoritesService.removeAlbumFromFavorites(id);
 
     // Remove album
     this.albums.splice(albumIndex, 1);
