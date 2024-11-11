@@ -3,14 +3,17 @@ import { forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/commo
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { v4 as uuidv4 } from 'uuid';
 import { FavoritesService } from '../favorites/favorites.service';
-
+import { TrackService } from 'src/track/track.service';
 @Injectable()
 export class AlbumService {
   private albums = [];
 
   constructor(
     @Inject(forwardRef(() => FavoritesService))
-    private readonly favoritesService: FavoritesService
+    private readonly favoritesService: FavoritesService,
+    
+    @Inject(forwardRef(() => TrackService))
+    private readonly trackService: TrackService
   ) {}
 
   create(createAlbumDto: CreateAlbumDto) {
@@ -45,6 +48,8 @@ export class AlbumService {
     if (albumIndex === -1) {
       throw new NotFoundException(`Album with id ${id} not found`);
     }
+
+    this.trackService.removeAlbumFromTracks(id);
 
     // Remove album from favorites
     // this.favoritesService.removeAlbumFromFavorites(id);

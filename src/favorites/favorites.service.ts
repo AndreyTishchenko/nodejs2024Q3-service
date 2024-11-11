@@ -31,8 +31,8 @@ export class FavoritesService {
   }
 
   // Add track to global favorites
-  addTrackToFavorites(addTrackDto: AddTrackToFavoritesDto) {
-    const track = this.trackService.findOne(addTrackDto.trackId);
+  addTrackToFavorites(trackId: string) {
+    const track = this.trackService.findOne(trackId);
 
     // Check if the track is already in favorites
     if (this.globalFavorites.tracks.includes(track.id)) {
@@ -54,8 +54,8 @@ export class FavoritesService {
   }
 
   // Add album to global favorites
-  addAlbumToFavorites(addAlbumDto: AddAlbumToFavoritesDto) {
-    const album = this.albumService.findOne(addAlbumDto.albumId);
+  addAlbumToFavorites(albumId: string) {
+    const album = this.albumService.findOne(albumId);
 
     // Check if the album is already in favorites
     if (this.globalFavorites.albums.includes(album.id)) {
@@ -77,8 +77,8 @@ export class FavoritesService {
   }
 
   // Add artist to global favorites
-  addArtistToFavorites(addArtistDto: AddArtistToFavoritesDto) {
-    const artist = this.artistService.findOne(addArtistDto.artistId);
+  addArtistToFavorites(artistId: string) {
+    const artist = this.artistService.findOne(artistId);
 
     // Check if the artist is already in favorites
     if (this.globalFavorites.artists.includes(artist.id)) {

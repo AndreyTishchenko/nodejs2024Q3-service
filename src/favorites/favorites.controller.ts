@@ -5,6 +5,7 @@ import { AddTrackToFavoritesDto } from './dto/add-to-favorites.dto';
 import { AddAlbumToFavoritesDto } from './dto/add-to-favorites.dto';
 import { AddArtistToFavoritesDto } from './dto/add-to-favorites.dto';
 import { ApiTags, ApiResponse, ApiBody } from '@nestjs/swagger';
+import { CheckUUID } from 'src/common/pipes/uuid-validation.pipe';
 
 @ApiTags('global-favorites')
 @Controller('favs')
@@ -12,16 +13,20 @@ export class FavoritesController {
   constructor(private readonly favoritesService: FavoritesService) {}
 
   @Get()
+
   @ApiResponse({ status: 200, description: 'Get all global favorites' })
+
   getAllFavorites() {
     return this.favoritesService.getAllFavorites();
   }
 
-  @Post('track')
-  @ApiBody({ type: AddTrackToFavoritesDto })
+  @Post('track/:id')
+
   @ApiResponse({ status: 201, description: 'Track added to global favorites' })
-  addTrackToFavorites(@Body() addTrackDto: AddTrackToFavoritesDto) {
-    return this.favoritesService.addTrackToFavorites(addTrackDto);
+
+  addTrackToFavorites(@Param() params: CheckUUID) {
+    const { id } = params;
+    return this.favoritesService.addTrackToFavorites(id);
   }
 
   @Delete('track/:trackId')
@@ -30,11 +35,12 @@ export class FavoritesController {
     this.favoritesService.removeTrackFromFavorites(trackId);
   }
 
-  @Post('album')
+  @Post('album/:id')
   @ApiBody({ type: AddAlbumToFavoritesDto })
   @ApiResponse({ status: 201, description: 'Album added to global favorites' })
-  addAlbumToFavorites(@Body() addAlbumDto: AddAlbumToFavoritesDto) {
-    return this.favoritesService.addAlbumToFavorites(addAlbumDto);
+  addAlbumToFavorites(@Param() params: CheckUUID) {
+    const { id } = params;
+    return this.favoritesService.addAlbumToFavorites(id);
   }
 
   @Delete('album/:albumId')
@@ -43,11 +49,14 @@ export class FavoritesController {
     this.favoritesService.removeAlbumFromFavorites(albumId);
   }
 
-  @Post('artist')
-  @ApiBody({ type: AddArtistToFavoritesDto })
+  @Post('artist/:id')
+
   @ApiResponse({ status: 201, description: 'Artist added to global favorites' })
-  addArtistToFavorites(@Body() addArtistDto: AddArtistToFavoritesDto) {
-    return this.favoritesService.addArtistToFavorites(addArtistDto);
+
+  addArtistToFavorites(@Param() params: CheckUUID) {
+    console.log(params);
+    const { id } = params;
+    return this.favoritesService.addArtistToFavorites(id);
   }
 
   @Delete('artist/:artistId')
