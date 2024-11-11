@@ -1,4 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
 
 @Entity()
 export class Artist {
@@ -28,8 +34,6 @@ export class Album {
   artist: Artist | null;
 }
 
-
-  
 @Entity()
 export class Track {
   @PrimaryGeneratedColumn('uuid')
@@ -47,43 +51,41 @@ export class Track {
   album: Album | null;
 
   @Column()
-  duration: number;  // Duration in seconds
+  duration: number; // Duration in seconds
 }
 
-  
-  @Entity()
-  export class User {
-    @PrimaryGeneratedColumn('uuid')
-    id: string;
-  
-    @Column()
-    login: string;
-  
-    @Column()
-    password: string;
-  
-    @Column({ default: 1 })
-    version: number;
-  
-    @Column({ type: 'bigint' })
-    createdAt: number;
-  
-    @Column({ type: 'bigint' })
-    updatedAt: number;
-  }
-  
-  @Entity()
-  export class Favorites {
-    @PrimaryGeneratedColumn('uuid')
-    id: string;
-  
-    @Column('simple-array')
-    artists: string[];  // Array of Artist IDs
-  
-    @Column('simple-array')
-    albums: string[];   // Array of Album IDs
-  
-    @Column('simple-array')
-    tracks: string[];   // Array of Track IDs
-  }
-  
+@Entity()
+export class User {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @Column()
+  login: string;
+
+  @Column()
+  password: string;
+
+  @Column({ default: 1 })
+  version: number;
+
+  @Column({ type: 'bigint' })
+  createdAt: number;
+
+  @Column({ type: 'bigint' })
+  updatedAt: number;
+}
+
+@Entity()
+export class Favorites {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @Column('simple-array')
+  artists: string[]; // Array of Artist IDs
+
+  @Column('simple-array')
+  albums: string[]; // Array of Album IDs
+
+  @Column('simple-array')
+  tracks: string[]; // Array of Track IDs
+}

@@ -1,4 +1,8 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { v4 as uuidv4 } from 'uuid';
 import { IsUUID } from 'class-validator';
@@ -21,7 +25,7 @@ export class UserService {
       login: newUser.login,
       version: newUser.version,
       createdAt: newUser.createdAt,
-      updatedAt: newUser.updatedAt
+      updatedAt: newUser.updatedAt,
     };
   }
 
@@ -29,7 +33,7 @@ export class UserService {
     return this.users;
   }
 
-  findOne( id: string) {
+  findOne(id: string) {
     const user = this.users.find((user) => user.id === id);
     if (!user) {
       throw new NotFoundException(`User with id ${id} not found`);
@@ -40,7 +44,7 @@ export class UserService {
   update(id: string, oldPassword: string, newPassword: string) {
     // Find user by ID
     const user = this.users.find((user) => user.id === id);
-    
+
     // Check if user exists, throw 404 if not found
     if (!user) {
       throw new NotFoundException(`User with id ${id} not found`);
@@ -54,7 +58,7 @@ export class UserService {
     // Update password and timestamp
     user.password = newPassword;
     user.updatedAt = Date.now();
-    user.version = user.version + 1
+    user.version = user.version + 1;
 
     return {
       id: user.id,

@@ -1,4 +1,4 @@
-import 'reflect-metadata';  // добавьте эту строку
+import 'reflect-metadata'; // добавьте эту строку
 import { NestFactory } from '@nestjs/core/nest-factory';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
@@ -13,9 +13,9 @@ async function bootstrap() {
     .setVersion('1.0')
     .addBearerAuth()
     .build();
-  
+
   const document = SwaggerModule.createDocument(app, options);
-  SwaggerModule.setup('api', app, document);  // Swagger docs will be available at /api
+  SwaggerModule.setup('api', app, document); // Swagger docs will be available at /api
 
   await app.listen(process.env.PORT || 4000);
 }

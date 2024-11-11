@@ -1,5 +1,10 @@
 // src/artist/artist.service.ts
-import { forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  forwardRef,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { v4 as uuidv4 } from 'uuid';
 import { TrackService } from '../track/track.service';
@@ -48,8 +53,8 @@ export class ArtistService {
     const artistIndex = this.artists.findIndex((artist) => {
       console.log(artist.id);
       console.log(id);
-      console.log(artist.id === id)
-      return artist.id === id
+      console.log(artist.id === id);
+      return artist.id === id;
     });
     if (artistIndex === -1) {
       throw new NotFoundException(`Artist with id ${id} not found`);

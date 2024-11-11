@@ -5,9 +5,9 @@ import { UserService } from './user.service';
 import { UserController } from './user.controller';
 
 @Module({
-  imports: [User],  // Import User entity
-  controllers: [UserController],  // Register the controller
-  providers: [UserService],  // Register services
-  exports: [UserService],  // Export service if it's used in other modules
+  imports: [User], // Import User entity
+  controllers: [UserController], // Register the controller
+  providers: [UserService], // Register services
+  exports: [UserService], // Export service if it's used in other modules
 })
 export class UserModule {}

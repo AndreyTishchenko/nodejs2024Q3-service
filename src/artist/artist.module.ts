@@ -8,10 +8,14 @@ import { AlbumsModule } from 'src/album/album.module';
 import { TrackModule } from 'src/track/track.module';
 
 @Module({
-
-  imports: [Artist, forwardRef(() => FavoritesModule), AlbumsModule, TrackModule],  // Import Artist entity
-  controllers: [ArtistController],  // Register the controller
-  providers: [ArtistService],  // Register services
-  exports: [ArtistService],  // Export ArtistService
+  imports: [
+    Artist,
+    forwardRef(() => FavoritesModule),
+    AlbumsModule,
+    TrackModule,
+  ], // Import Artist entity
+  controllers: [ArtistController], // Register the controller
+  providers: [ArtistService], // Register services
+  exports: [ArtistService], // Export ArtistService
 })
 export class ArtistModule {}

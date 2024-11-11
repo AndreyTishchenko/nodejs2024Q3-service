@@ -1,5 +1,10 @@
 // src/album/album.service.ts
-import { forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  forwardRef,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { v4 as uuidv4 } from 'uuid';
 import { FavoritesService } from '../favorites/favorites.service';
@@ -11,9 +16,9 @@ export class AlbumService {
   constructor(
     @Inject(forwardRef(() => FavoritesService))
     private readonly favoritesService: FavoritesService,
-    
+
     @Inject(forwardRef(() => TrackService))
-    private readonly trackService: TrackService
+    private readonly trackService: TrackService,
   ) {}
 
   create(createAlbumDto: CreateAlbumDto) {
@@ -60,7 +65,7 @@ export class AlbumService {
 
   // Helper method to remove artist reference from albums
   removeArtistFromAlbums(artistId: string) {
-    this.albums.forEach(album => {
+    this.albums.forEach((album) => {
       if (album.artistId === artistId) {
         album.artistId = null;
       }

@@ -52,15 +52,15 @@ export class TrackService {
 
   // Helper method to remove artist reference from tracks
   removeArtistFromTracks(artistId: string) {
-    this.tracks.forEach(track => {
+    this.tracks.forEach((track) => {
       if (track.artistId === artistId) {
         track.artistId = null;
       }
     });
   }
-  
+
   removeAlbumFromTracks(albumId: string) {
-    this.tracks.forEach(track => {
+    this.tracks.forEach((track) => {
       if (track.albumId === albumId) {
         track.albumId = null;
       }

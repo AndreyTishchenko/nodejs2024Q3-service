@@ -13,7 +13,7 @@ import { FavoritesModule } from './favorites/favorites.module';
     ArtistModule,
     AlbumsModule,
     TrackModule,
-    FavoritesModule
+    FavoritesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
