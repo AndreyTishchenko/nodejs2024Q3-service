@@ -45,7 +45,12 @@ export class ArtistService {
   }
 
   remove(id: string): void {
-    const artistIndex = this.artists.findIndex((artist) => artist.id === id);
+    const artistIndex = this.artists.findIndex((artist) => {
+      console.log(artist.id);
+      console.log(id);
+      console.log(artist.id === id)
+      return artist.id === id
+    });
     if (artistIndex === -1) {
       throw new NotFoundException(`Artist with id ${id} not found`);
     }
@@ -53,7 +58,7 @@ export class ArtistService {
     // Delete the artist from tracks and albums
     this.trackService.removeArtistFromTracks(id);
     this.albumService.removeArtistFromAlbums(id);
-    this.favoritesService.removeArtistFromFavorites(id);
+    // this.favoritesService.removeArtistFromFavorites(id);
 
     // Remove the artist from the list
     this.artists.splice(artistIndex, 1);

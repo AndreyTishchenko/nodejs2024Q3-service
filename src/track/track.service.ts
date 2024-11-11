@@ -44,7 +44,7 @@ export class TrackService {
     }
 
     // Remove track from favorites
-    this.favoritesService.removeTrackFromFavorites(id);
+    // this.favoritesService.removeTrackFromFavorites(id);
 
     // Remove track
     this.tracks.splice(trackIndex, 1);
