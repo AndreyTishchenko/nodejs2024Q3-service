@@ -308,6 +308,7 @@ describe('Favorites (e2e)', () => {
       const artistsResponse = await unauthorizedRequest
         .post(favoritesRoutes.artists(randomUUID))
         .set(commonHeaders);
+      console.log(artistsResponse.body);
 
       expect(artistsResponse.status).toBe(StatusCodes.UNPROCESSABLE_ENTITY);
 
