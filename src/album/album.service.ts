@@ -1,74 +1,54 @@
-// src/album/album.service.ts
-import {
-  forwardRef,
-  Inject,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateAlbumDto } from './dto/create-album.dto';
-import { v4 as uuidv4 } from 'uuid';
-import { FavoritesService } from '../favorites/favorites.service';
-import { TrackService } from 'src/track/track.service';
+import { DbService } from 'src/db/db.service';
+import { AlbumEntity } from './entities/entity';
+import { UpdateAlbumDto } from './dto/update-album.dto';
+import { Track } from 'src/track/interface/track.interface';
+
 @Injectable()
 export class AlbumService {
-  private albums = [];
-
-  constructor(
-    @Inject(forwardRef(() => FavoritesService))
-    private readonly favoritesService: FavoritesService,
-
-    @Inject(forwardRef(() => TrackService))
-    private readonly trackService: TrackService,
-  ) {}
-
+  constructor(private db: DbService) {}
   create(createAlbumDto: CreateAlbumDto) {
-    const newAlbum = {
-      id: uuidv4(),
-      ...createAlbumDto,
-    };
-    this.albums.push(newAlbum);
+    const newAlbum = new AlbumEntity(createAlbumDto);
+    this.db.albums.push(newAlbum);
     return newAlbum;
   }
 
   findAll() {
-    return this.albums;
+    return this.db.albums;
   }
 
   findOne(id: string) {
-    const album = this.albums.find((album) => album.id === id);
-    if (!album) {
+    const currentAlbum = this.db.albums.find((album) => album.id === id);
+    if (!currentAlbum) {
       throw new NotFoundException(`Album with id ${id} not found`);
     }
-    return album;
+    return currentAlbum;
   }
 
-  update(id: string, updateAlbumDto: CreateAlbumDto) {
-    const album = this.findOne(id);
-    Object.assign(album, updateAlbumDto);
-    return album;
+  update(id: string, updateAlbumDto: UpdateAlbumDto) {
+    const currentAlbum = this.findOne(id);
+    currentAlbum.artistId = updateAlbumDto.artistId || currentAlbum.artistId;
+    currentAlbum.name = updateAlbumDto.name || currentAlbum.name;
+    currentAlbum.year = updateAlbumDto.year || currentAlbum.year;
+    return currentAlbum;
   }
 
   remove(id: string) {
-    const albumIndex = this.albums.findIndex((album) => album.id === id);
-    if (albumIndex === -1) {
-      throw new NotFoundException(`Album with id ${id} not found`);
-    }
-
-    this.trackService.removeAlbumFromTracks(id);
-
-    // Remove album from favorites
-    this.favoritesService.removeAlbumFromFavorites(id);
-
-    // Remove album
-    this.albums.splice(albumIndex, 1);
-  }
-
-  // Helper method to remove artist reference from albums
-  removeArtistFromAlbums(artistId: string) {
-    this.albums.forEach((album) => {
-      if (album.artistId === artistId) {
-        album.artistId = null;
+    const currentAlbum = this.findOne(id);
+    const index = this.db.albums.findIndex((u) => u.id === currentAlbum.id);
+    this.db.tracks.forEach((track: Track) => {
+      if (track.albumId === id) {
+        track.albumId = null;
       }
     });
+
+    this.db.favorites.albums = this.db.favorites.albums.filter(
+      (albumsId: string) => albumsId !== id,
+    );
+
+    if (index !== -1) {
+      this.db.albums.splice(index, 1);
+    }
   }
 }

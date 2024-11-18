@@ -1,69 +1,79 @@
-// src/track/track.service.ts
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateTrackDto } from './dto/create-track.dto';
-import { v4 as uuidv4 } from 'uuid';
-import { FavoritesService } from '../favorites/favorites.service';
+import { UpdateTrackDto } from './dto/update-track.dto';
+import { DbEntities } from 'src/db/types/db.interface';
+import { DbService } from 'src/db/db.service';
+import { TrackEntity } from './entities/track.entity';
 
 @Injectable()
 export class TrackService {
-  private tracks = [];
+  constructor(private db: DbService) {}
+  createTrack(createTrackDto: CreateTrackDto) {
+    const conditionAlbum = this.db.verifyEntityPresence(
+      createTrackDto.artistId,
+      DbEntities.ALBUMS,
+    );
+    if (conditionAlbum) {
+      throw new NotFoundException(
+        `Album with ID ${createTrackDto.artistId} not found`,
+      );
+    }
 
-  constructor(private readonly favoritesService: FavoritesService) {}
+    const newTrack = new TrackEntity(createTrackDto);
 
-  create(createTrackDto: CreateTrackDto) {
-    const newTrack = {
-      id: uuidv4(),
-      ...createTrackDto,
-    };
-    this.tracks.push(newTrack);
+    this.db.tracks.push(newTrack);
     return newTrack;
   }
 
-  findAll() {
-    return this.tracks;
+  findAllTracks() {
+    return this.db.tracks;
   }
 
-  findOne(id: string) {
-    const track = this.tracks.find((track) => track.id === id);
-    if (!track) {
+  findOneTrack(id: string) {
+    const currentTrack = this.db.tracks.find((track) => track.id === id);
+    if (!currentTrack) {
       throw new NotFoundException(`Track with id ${id} not found`);
     }
-    return track;
+    return currentTrack;
   }
 
-  update(id: string, updateTrackDto: CreateTrackDto) {
-    const track = this.findOne(id);
-    Object.assign(track, updateTrackDto);
-    return track;
-  }
-
-  remove(id: string) {
-    const trackIndex = this.tracks.findIndex((track) => track.id === id);
-    if (trackIndex === -1) {
-      throw new NotFoundException(`Track with id ${id} not found`);
+  updateTrack(id: string, updateTrackDto: UpdateTrackDto) {
+    const currentTrack = this.findOneTrack(id);
+    const conditionArtist = this.db.verifyEntityPresence(
+      updateTrackDto.artistId,
+      DbEntities.ARTISTS,
+    );
+    const conditionAlbum = this.db.verifyEntityPresence(
+      updateTrackDto.artistId,
+      DbEntities.ALBUMS,
+    );
+    if (conditionArtist) {
+      throw new NotFoundException(
+        `Artist with ID ${updateTrackDto.artistId} not found`,
+      );
+    }
+    if (conditionAlbum) {
+      throw new NotFoundException(
+        `Album with ID ${updateTrackDto.artistId} not found`,
+      );
     }
 
-    // Remove track from favorites
-    this.favoritesService.removeTrackFromFavorites(id);
+    currentTrack.albumId = updateTrackDto.albumId || currentTrack.albumId;
+    currentTrack.artistId = updateTrackDto.artistId || currentTrack.artistId;
+    currentTrack.duration = updateTrackDto.duration || currentTrack.duration;
+    currentTrack.name = updateTrackDto.name || currentTrack.name;
 
-    // Remove track
-    this.tracks.splice(trackIndex, 1);
+    return currentTrack;
   }
 
-  // Helper method to remove artist reference from tracks
-  removeArtistFromTracks(artistId: string) {
-    this.tracks.forEach((track) => {
-      if (track.artistId === artistId) {
-        track.artistId = null;
-      }
-    });
-  }
-
-  removeAlbumFromTracks(albumId: string) {
-    this.tracks.forEach((track) => {
-      if (track.albumId === albumId) {
-        track.albumId = null;
-      }
-    });
+  removeTrack(id: string) {
+    const currentTrack = this.findOneTrack(id);
+    this.db.favorites.tracks = this.db.favorites.tracks.filter(
+      (trackID) => trackID !== currentTrack.id,
+    );
+    const index = this.db.tracks.findIndex((u) => u.id === currentTrack.id);
+    if (index !== -1) {
+      this.db.tracks.splice(index, 1);
+    }
   }
 }

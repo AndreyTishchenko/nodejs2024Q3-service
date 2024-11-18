@@ -2,21 +2,24 @@ import 'reflect-metadata'; // добавьте эту строку
 import { NestFactory } from '@nestjs/core/nest-factory';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
+import { ValidationPipe } from '@nestjs/common/pipes/validation.pipe';
+import { INestApplication } from '@nestjs/common';
+
+const defaultPort = 4000;
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.useGlobalPipes(new ValidationPipe());
 
-  // OpenAPI/Swagger configuration
-  const options = new DocumentBuilder()
-    .setTitle('Home Music Library Service')
-    .setDescription('API for managing a home music library')
-    .setVersion('1.0')
-    .addBearerAuth()
-    .build();
+  // await setupSwagger(app);
 
-  const document = SwaggerModule.createDocument(app, options);
-  SwaggerModule.setup('api', app, document); // Swagger docs will be available at /api
-
-  await app.listen(process.env.PORT || 4000);
+  const PORT = process.env.PORT || defaultPort;
+  await app.listen(PORT, () =>
+    console.log(`\x1b[35mApplication is running on port: ${PORT}\x1b[0m`),
+  );
 }
 bootstrap();
+// function setupSwagger(app: INestApplication) {
+//   throw new Error('Function not implemented.');
+// }
+

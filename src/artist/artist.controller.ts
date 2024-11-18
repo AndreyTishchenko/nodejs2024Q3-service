@@ -6,15 +6,14 @@ import {
   Param,
   Put,
   Delete,
-  UsePipes,
-  ValidationPipe,
   HttpStatus,
   HttpCode,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { ArtistService } from './artist.service';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { ApiTags, ApiResponse } from '@nestjs/swagger';
-import { CheckUUID } from 'src/common/pipes/uuid-validation.pipe';
+import { UpdateArtistDto } from './dto/update-artist.dto';
 
 @ApiTags('artist')
 @Controller('artist')
@@ -22,40 +21,32 @@ export class ArtistController {
   constructor(private readonly artistService: ArtistService) {}
 
   @Post()
-  @UsePipes(new ValidationPipe()) // Validation of request body and param
-  @ApiResponse({ status: 201, description: 'Artist created successfully' })
-  create(@Body() createArtistDto: CreateArtistDto) {
-    return this.artistService.create(createArtistDto);
+  async create(@Body() createArtistDto: CreateArtistDto) {
+    return await this.artistService.create(createArtistDto);
   }
 
   @Get()
   @ApiResponse({ status: 200, description: 'Returns all artists' })
-  findAll() {
-    return this.artistService.findAll();
+  async findAll() {
+    return await this.artistService.findAll();
   }
 
   @Get(':id')
-  @ApiResponse({ status: 200, description: 'Returns a single artist' })
-  @ApiResponse({ status: 404, description: 'Artist not found' })
-  @UsePipes(new ValidationPipe()) // Validation of request body and param
-  findOne(@Param() params: CheckUUID) {
-    const { id } = params;
-    return this.artistService.findOne(id);
+  async findOne(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
+    return await this.artistService.findOne(id);
   }
 
   @Put(':id')
-  @UsePipes(new ValidationPipe()) // Validation of request body and param
-  update(@Param() params: CheckUUID, @Body() updateArtistDto: CreateArtistDto) {
-    const { id } = params;
-    return this.artistService.update(id, updateArtistDto);
+  async update(
+    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
+    @Body() updateArtistDto: UpdateArtistDto
+  ) {
+    return await this.artistService.update(id, updateArtistDto);
   }
 
   @Delete(':id')
-  @UsePipes(new ValidationPipe())
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param() params: CheckUUID) {
-    const { id } = params;
-    console.log('Deleting artist with id:', id); // Debug line to confirm the `id` is correct
-    this.artistService.remove(id);
+  async remove(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
+    await this.artistService.remove(id);
   }
 }

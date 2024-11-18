@@ -1,61 +1,48 @@
-// src/track/track.controller.ts
 import {
   Controller,
   Get,
   Post,
   Body,
   Param,
-  Put,
   Delete,
+  ParseUUIDPipe,
+  Put,
   HttpCode,
-  HttpStatus,
-  UsePipes,
-  ValidationPipe,
 } from '@nestjs/common';
 import { TrackService } from './track.service';
 import { CreateTrackDto } from './dto/create-track.dto';
-import { ApiTags, ApiResponse } from '@nestjs/swagger';
-import { CheckUUID } from 'src/common/pipes/uuid-validation.pipe';
+import { UpdateTrackDto } from './dto/update-track.dto';
 
-@ApiTags('tracks')
 @Controller('track')
 export class TrackController {
   constructor(private readonly trackService: TrackService) {}
 
   @Post()
-  @ApiResponse({ status: 201, description: 'Track created successfully' })
-  @UsePipes(new ValidationPipe()) // Validation of request body and param
-  create(@Body() createTrackDto: CreateTrackDto) {
-    return this.trackService.create(createTrackDto);
+  createTrack(@Body() createTrackDto: CreateTrackDto) {
+    return this.trackService.createTrack(createTrackDto);
   }
 
   @Get()
-  @ApiResponse({ status: 200, description: 'Returns all tracks' })
-  findAll() {
-    return this.trackService.findAll();
+  findAllTracks() {
+    return this.trackService.findAllTracks();
   }
 
   @Get(':id')
-  @ApiResponse({ status: 200, description: 'Returns a single track' })
-  @ApiResponse({ status: 404, description: 'Track not found' })
-  @UsePipes(new ValidationPipe()) // Validation of request body and param
-  findOne(@Param() params: CheckUUID) {
-    const { id } = params;
-    return this.trackService.findOne(id);
+  findOneTrack(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
+    return this.trackService.findOneTrack(id);
   }
 
   @Put(':id')
-  @UsePipes(new ValidationPipe()) // Validation of request body and param
-  update(@Param() params: CheckUUID, @Body() updateTrackDto: CreateTrackDto) {
-    const { id } = params;
-    return this.trackService.update(id, updateTrackDto);
+  updateTrack(
+    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
+    @Body() updateTrackDto: UpdateTrackDto,
+  ) {
+    return this.trackService.updateTrack(id, updateTrackDto);
   }
 
   @Delete(':id')
-  @UsePipes(new ValidationPipe()) // Validation of request body and param
-  @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param() params: CheckUUID) {
-    const { id } = params;
-    this.trackService.remove(id);
+  @HttpCode(204)
+  removeTrack(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
+    return this.trackService.removeTrack(id);
   }
 }

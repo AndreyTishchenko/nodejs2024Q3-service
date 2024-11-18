@@ -1,13 +1,11 @@
-// src/user/dto/create-user.dto.ts
-import { IsString, MinLength, MaxLength } from 'class-validator';
+import { IsString, IsNotEmpty } from 'class-validator';
 
 export class CreateUserDto {
-  @IsString()
-  @MinLength(3)
-  @MaxLength(20)
+  @IsString({ message: 'Login must be a string.' })
+  @IsNotEmpty({ message: 'Login is required.' })
   login: string;
 
-  @IsString()
-  @MinLength(6)
+  @IsString({ message: 'Password must be a string.' })
+  @IsNotEmpty({ message: 'Password is required.' })
   password: string;
 }

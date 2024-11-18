@@ -7,65 +7,62 @@ import {
 } from '@nestjs/common';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { v4 as uuidv4 } from 'uuid';
-import { TrackService } from '../track/track.service';
-import { AlbumService } from '../album/album.service';
-import { FavoritesService } from '../favorites/favorites.service';
-
+import { DbService } from '../db/db.service';
+import { UpdateArtistDto } from './dto/update-artist.dto';
 @Injectable()
 export class ArtistService {
-  private artists = [];
+  constructor(private db: DbService) {}
 
-  constructor(
-    @Inject(forwardRef(() => FavoritesService))
-    private readonly favoritesService: FavoritesService,
-    private readonly trackService: TrackService,
-    private readonly albumService: AlbumService,
-  ) {}
-
-  create(createArtistDto: CreateArtistDto) {
+  async create(createArtistDto: CreateArtistDto) {
     const newArtist = {
       id: uuidv4(),
       ...createArtistDto,
     };
-    this.artists.push(newArtist);
+    this.db.artists.push(newArtist);
     return newArtist;
   }
 
-  findAll() {
-    return this.artists;
+  async findAll() {
+    return this.db.artists;
   }
 
-  findOne(id: string) {
-    const artist = this.artists.find((artist) => artist.id === id);
+  async findOne(id: string) {
+    const artist = this.db.artists.find((artist) => artist.id === id);
     if (!artist) {
       throw new NotFoundException(`Artist with id ${id} not found`);
     }
     return artist;
   }
 
-  update(id: string, updateArtistDto: CreateArtistDto) {
-    const artist = this.findOne(id);
+  async update(id: string, updateArtistDto: UpdateArtistDto) {
+    const artist = await this.findOne(id);
     Object.assign(artist, updateArtistDto);
     return artist;
   }
 
-  remove(id: string): void {
-    const artistIndex = this.artists.findIndex((artist) => {
-      console.log(artist.id);
-      console.log(id);
-      console.log(artist.id === id);
-      return artist.id === id;
-    });
+  async remove(id: string) {
+    const CurrentArtist = await this.findOne(id);
+    const artistIndex = this.db.artists.findIndex((artist) => { return artist.id === CurrentArtist.id; });
     if (artistIndex === -1) {
       throw new NotFoundException(`Artist with id ${id} not found`);
     }
 
-    // Delete the artist from tracks and albums
-    this.trackService.removeArtistFromTracks(id);
-    this.albumService.removeArtistFromAlbums(id);
-    this.favoritesService.removeArtistFromFavorites(id);
+    this.db.tracks.forEach((track) => {
+      if (track.artistId === id) {
+        track.artistId = null;
+      }
+    });
 
-    // Remove the artist from the list
-    this.artists.splice(artistIndex, 1);
+    this.db.albums.forEach((album) => {
+      if (album.artistId === id) {
+        album.artistId = null;
+      }
+    });
+
+    this.db.favorites.artists = this.db.favorites.artists.filter(
+      (storedId) => storedId !== CurrentArtist.id,
+    );
+    
+    this.db.artists.splice(artistIndex, 1);
   }
 }

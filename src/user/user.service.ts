@@ -5,13 +5,12 @@ import {
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { v4 as uuidv4 } from 'uuid';
-import { IsUUID } from 'class-validator';
+import { DbService } from 'src/db/db.service';
 
 @Injectable()
 export class UserService {
-  private users = [];
-
-  create(createUserDto: CreateUserDto) {
+  constructor(private db: DbService) {}
+  async create(createUserDto: CreateUserDto) {
     const newUser = {
       id: uuidv4(),
       ...createUserDto,
@@ -19,7 +18,7 @@ export class UserService {
       createdAt: Date.now(),
       updatedAt: Date.now(),
     };
-    this.users.push(newUser);
+    this.db.users.push(newUser);
     return {
       id: newUser.id,
       login: newUser.login,
@@ -29,26 +28,21 @@ export class UserService {
     };
   }
 
-  findAll() {
-    return this.users;
+  async findAll() {
+    return this.db.users;
   }
 
-  findOne(id: string) {
-    const user = this.users.find((user) => user.id === id);
+  async findOne(id: string) {
+    const user = this.db.users.find((user) => user.id === id);
     if (!user) {
       throw new NotFoundException(`User with id ${id} not found`);
     }
     return user;
   }
 
-  update(id: string, oldPassword: string, newPassword: string) {
+  async update(id: string, oldPassword: string, newPassword: string) {
     // Find user by ID
-    const user = this.users.find((user) => user.id === id);
-
-    // Check if user exists, throw 404 if not found
-    if (!user) {
-      throw new NotFoundException(`User with id ${id} not found`);
-    }
+    const user = await this.findOne(id);
 
     // Check if the old password is correct, throw 403 if not
     if (user.password !== oldPassword) {
@@ -69,12 +63,12 @@ export class UserService {
     };
   }
 
-  remove(id: string) {
-    const index = this.users.findIndex((user) => user.id === id);
-    if (index === -1) {
-      throw new NotFoundException(`User with id ${id} not found`);
+  async remove(id: string) {
+    const currentUser = await this.findOne(id);
+    const index = this.db.users.findIndex((u) => u.id === currentUser.id);
+    if (index !== -1) {
+      this.db.users.splice(index, 1);
     }
-    this.users.splice(index, 1);
     // No return value is necessary, deletion is implied by the operation
   }
 }
