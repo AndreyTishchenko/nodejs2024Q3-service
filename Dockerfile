@@ -18,4 +18,4 @@ RUN npm cache clean --force
 
 EXPOSE $PORT
 
-CMD ["npm", "run", "start:dev"]
+CMD ["npm", "run", "start:dev:migrate"]

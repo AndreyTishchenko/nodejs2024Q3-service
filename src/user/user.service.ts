@@ -5,12 +5,12 @@ import {
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { v4 as uuidv4 } from 'uuid';
-import { DbService } from 'src/db/db.service';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 
 @Injectable()
 export class UserService {
-  constructor(private db: DbService) {}
+  constructor(private db: PrismaService) {}
   async create(createUserDto: CreateUserDto) {
     const newUser = {
       id: uuidv4(),
