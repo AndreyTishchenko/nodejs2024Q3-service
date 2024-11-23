@@ -7,6 +7,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { v4 as uuidv4 } from 'uuid';
 import { DbService } from 'src/db/db.service';
 
+
 @Injectable()
 export class UserService {
   constructor(private db: DbService) {}

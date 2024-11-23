@@ -1,5 +1,7 @@
+version: '3.8'
+
 services:
-  data-base:
+  data-base-pg:
     build: ./db/
     container_name: 'data-base-PG'
     restart: always
@@ -10,15 +12,13 @@ services:
     env_file:
       - .env
     command:
-      [
-        'postgres',
-        '-c',
-        'port=$DATA_BASE_PORT',
-        '-c',
-        'logging_collector=on',
-        '-c',
-        'log_statement=all',
-      ]
+      - 'postgres'
+      - '-c'
+      - 'port=$DATA_BASE_PORT'
+      - '-c'
+      - 'logging_collector=on'
+      - '-c'
+      - 'log_statement=all'
 
   app:
     build: .
@@ -28,7 +28,7 @@ services:
     tty: true
     stdin_open: true
     depends_on:
-      - data-base
+      - data-base-pg
     restart: on-failure
     networks:
       - internal
