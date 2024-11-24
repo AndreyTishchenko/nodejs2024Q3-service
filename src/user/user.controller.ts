@@ -43,6 +43,7 @@ export class UserController {
     @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
     @Body() updateUserDto: UpdateUserDto // Validate request body (oldPassword, newPassword)
   ) {
+
     // Call the service to handle password change
     return await this.userService.update(id, updateUserDto);
   }
