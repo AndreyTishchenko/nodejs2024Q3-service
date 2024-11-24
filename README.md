@@ -22,6 +22,11 @@ npm install
 ```
 docker-compose up --download
 ```
+If after this step app doesnt work try to input
+
+```
+docker-compose up
+```
 
 ## Create .env file
     copy .env.example and change name on .env
