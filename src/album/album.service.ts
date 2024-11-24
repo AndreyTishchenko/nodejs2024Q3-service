@@ -4,51 +4,57 @@ import { DbService } from 'src/db/db.service';
 import { AlbumEntity } from './entities/entity';
 import { UpdateAlbumDto } from './dto/update-album.dto';
 import { Track } from 'src/track/interface/track.interface';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class AlbumService {
-  constructor(private db: DbService) {}
-  create(createAlbumDto: CreateAlbumDto) {
-    const newAlbum = new AlbumEntity(createAlbumDto);
-    this.db.albums.push(newAlbum);
-    return newAlbum;
+  constructor(private prisma: PrismaService) {}
+  async create(createAlbumDto: CreateAlbumDto) {
+    
+    return await this.prisma.album.create({ data: createAlbumDto });;
   }
 
-  findAll() {
-    return this.db.albums;
+  async findAll() {
+    return await this.prisma.album.findMany();
   }
 
-  findOne(id: string) {
-    const currentAlbum = this.db.albums.find((album) => album.id === id);
+  async findOne(id: string) {
+    const currentAlbum = await this.prisma.album.findUnique({ where: { id } });
     if (!currentAlbum) {
       throw new NotFoundException(`Album with id ${id} not found`);
     }
     return currentAlbum;
   }
 
-  update(id: string, updateAlbumDto: UpdateAlbumDto) {
-    const currentAlbum = this.findOne(id);
-    currentAlbum.artistId = updateAlbumDto.artistId || currentAlbum.artistId;
-    currentAlbum.name = updateAlbumDto.name || currentAlbum.name;
-    currentAlbum.year = updateAlbumDto.year || currentAlbum.year;
-    return currentAlbum;
+  async update(id: string, updateAlbumDto: UpdateAlbumDto) {
+    try {
+      return await this.prisma.album.update({
+        where: { id },
+        data: updateAlbumDto,
+      });
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2025'
+      ) {
+        throw new NotFoundException(`Album with id ${id} not found`);
+      }
+      throw error;
+    }
   }
 
-  remove(id: string) {
-    const currentAlbum = this.findOne(id);
-    const index = this.db.albums.findIndex((u) => u.id === currentAlbum.id);
-    this.db.tracks.forEach((track: Track) => {
-      if (track.albumId === id) {
-        track.albumId = null;
+  async remove(id: string) {
+    try {
+      return await this.prisma.album.delete({ where: { id } });
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2025'
+      ) {
+        throw new NotFoundException(`Album with id ${id} not found`);
       }
-    });
-
-    this.db.favorites.albums = this.db.favorites.albums.filter(
-      (albumsId: string) => albumsId !== id,
-    );
-
-    if (index !== -1) {
-      this.db.albums.splice(index, 1);
+      throw error;
     }
   }
 }

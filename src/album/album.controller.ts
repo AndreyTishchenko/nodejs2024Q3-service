@@ -18,18 +18,18 @@ export class AlbumController {
   constructor(private readonly albumService: AlbumService) {}
 
   @Post()
-  create(@Body() createUserDto: CreateAlbumDto) {
-    return this.albumService.create(createUserDto);
+  async create(@Body() createUserDto: CreateAlbumDto) {
+    return await this.albumService.create(createUserDto);
   }
 
   @Get()
-  findAll() {
-    return this.albumService.findAll();
+  async findAll() {
+    return await this.albumService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
-    return this.albumService.findOne(id);
+  async findOne(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
+    return await this.albumService.findOne(id);
   }
 
   @Put(':id')
@@ -42,8 +42,8 @@ export class AlbumController {
 
   @Delete(':id')
   @HttpCode(204)
-  remove(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
-    this.albumService.remove(id); // Ensure no content is returned here
+  async remove(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
+    await this.albumService.remove(id); // Ensure no content is returned here
     // Explicitly return nothing here to ensure 204 status code
   }
 }

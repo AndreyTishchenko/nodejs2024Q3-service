@@ -41,12 +41,10 @@ export class UserController {
   @Put(':id')
   async changePassword(
     @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
-    @Body() changePasswordDto: UpdateUserDto, // Validate request body (oldPassword, newPassword)
+    @Body() updateUserDto: UpdateUserDto // Validate request body (oldPassword, newPassword)
   ) {
-    const { oldPassword, newPassword } = changePasswordDto;
-
     // Call the service to handle password change
-    return await this.userService.update(id, oldPassword, newPassword);
+    return await this.userService.update(id, updateUserDto);
   }
 
   @Delete(':id')
