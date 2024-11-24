@@ -16,18 +16,29 @@ async function bootstrap() {
   const logger = await app.resolve(EnhancedLoggingService);
   app.useLogger(logger);
 
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    }),
+  );
 
-  await setupSwagger(app);
+  setupSwagger(app);
+
   setupGlobalExceptionHandlers(logger);
 
   const PORT = process.env.PORT || defaultPort;
-  await app.listen(PORT, () =>
-    console.log(`\x1b[35mApplication is running on port: ${PORT}\x1b[0m`),
-  );
+  await app.listen(PORT);
+  
+  logger.log(`Application is running on port: ${PORT}`, 'Bootstrap');
 }
 bootstrap();
-// function setupSwagger(app: INestApplication) {
-//   throw new Error('Function not implemented.');
-// }
+
+bootstrap().catch((error) => {
+  console.error(
+    `\x1b[31mFailed to bootstrap the application: ${error.message}\x1b[0m`,
+  );
+  process.exit(1);
+});
 
