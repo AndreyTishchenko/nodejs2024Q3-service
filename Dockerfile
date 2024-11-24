@@ -1,4 +1,4 @@
-FROM node:18 as build
+FROM node:20.11.1 as build
 
 WORKDIR /user/app
 
@@ -8,7 +8,7 @@ RUN npm install
 
 # Clear npm cache to reduce image size and avoid potential issues
 
-FROM node:18-alpine
+FROM node:20.11.1-alpine
 
 WORKDIR /user/app
 
