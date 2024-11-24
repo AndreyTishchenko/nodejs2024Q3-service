@@ -42,11 +42,23 @@ export class EnhancedLoggingService extends ConsoleLogger {
     }
   }
   private timeStamp(): string {
-    return new Date()
-      .toISOString()
-      .replace('T', ' ')
-      .slice(0, -5)
+    const now = new Date();
+    const date = now
+      .toLocaleDateString('ru-RU', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+      })
+      .replace(/\./g, '-');
+    const time = now
+      .toLocaleTimeString('ru-RU', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false,
+      })
       .replace(/:/g, '-');
+    return `${date} ${time}`;
   }
   private generateFileName(baseName: string): string {
     const time = this.timeStamp();

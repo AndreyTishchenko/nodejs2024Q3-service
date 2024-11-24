@@ -13,6 +13,7 @@ async function bootstrap() {
     cors: true,
     bufferLogs: true,
   });
+
   const logger = await app.resolve(EnhancedLoggingService);
   app.useLogger(logger);
 
@@ -25,15 +26,17 @@ async function bootstrap() {
   );
 
   setupSwagger(app);
-
   setupGlobalExceptionHandlers(logger);
 
   const PORT = process.env.PORT || defaultPort;
   await app.listen(PORT);
-  
-  logger.log(`Application is running on port: ${PORT}`, 'Bootstrap');
+  //TODO Here we will test unhandled exceptions and unhandled rejections and work with logger
+  //Promise.reject('Test unhandled rejection for logging');
+  logger.log(
+    `\x1b[35mApplication is running on port: ${PORT}\x1b[0m`,
+    'Bootstrap',
+  );
 }
-bootstrap();
 
 bootstrap().catch((error) => {
   console.error(
@@ -41,4 +44,3 @@ bootstrap().catch((error) => {
   );
   process.exit(1);
 });
-
