@@ -1,22 +1,20 @@
-import {
-  ForbiddenException,
-  HttpException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
-import { v4 as uuidv4 } from 'uuid';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserEntity } from './entities/user.entity';
 import { Prisma } from '@prisma/client';
+import { hashPassword } from 'src/utils/hashPassword';
+import * as bcrypt from 'bcryptjs';
 
 
 @Injectable()
 export class UserService {
   constructor(private prisma: PrismaService) {}
   async create(createUserDto: CreateUserDto) {
-    const user = await this.prisma.user.create({ data: createUserDto });
+    const login = createUserDto.login;
+    const password = await hashPassword(createUserDto.password);
+    const user = await this.prisma.user.create({ data: { login, password } });
     return new UserEntity(user);
   }
 
@@ -37,22 +35,24 @@ export class UserService {
   }
 
   async update(id: string, UpdateUserDto: UpdateUserDto) {
-    const currentUser = await this.prisma.user.findUnique({
-      where: { id },
-    });
+    const currentUser = await this.prisma.user.findUnique({ where: { id } });
+
 
     if (!currentUser) {
       throw new NotFoundException(`User with id ${id} not found`);
     }
 
-    if (currentUser.password !== UpdateUserDto.oldPassword) {
-      throw new HttpException('Old password does not match', 403);
+    const passwordMatches = await bcrypt.compare(UpdateUserDto.oldPassword, currentUser.password);
+    if (!passwordMatches) {
+      throw new HttpException('Old password does not match', HttpStatus.FORBIDDEN);
     }
 
+    const hashedPassword = await hashPassword(UpdateUserDto.newPassword);
+    
     const updatedUser = await this.prisma.user.update({
       where: { id },
       data: {
-        password: UpdateUserDto.newPassword,
+        password: hashedPassword,
         version: { increment: 1 },
       },
     });
