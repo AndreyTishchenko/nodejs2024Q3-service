@@ -28,7 +28,9 @@ export class TrackController {
   }
 
   @Get(':id')
-  async findOneTrack(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
+  async findOneTrack(
+    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
+  ) {
     return await this.trackService.findOneTrack(id);
   }
 
@@ -42,7 +44,9 @@ export class TrackController {
 
   @Delete(':id')
   @HttpCode(204)
-  async removeTrack(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
+  async removeTrack(
+    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
+  ) {
     return await this.trackService.removeTrack(id);
   }
 }

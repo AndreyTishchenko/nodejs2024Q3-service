@@ -40,7 +40,7 @@ export class TrackService {
       }
       throw error;
     }
-}
+  }
 
   async removeTrack(id: string) {
     try {

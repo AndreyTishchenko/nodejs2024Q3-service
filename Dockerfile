@@ -4,7 +4,7 @@ WORKDIR /user/app
 
 COPY . .
 
-RUN npm install
+RUN npm cache clean --force && npm install
 
 # Clear npm cache to reduce image size and avoid potential issues
 
@@ -13,8 +13,6 @@ FROM node:20.11.1-alpine
 WORKDIR /user/app
 
 COPY --from=build /user/app /user/app
-
-RUN npm cache clean --force
 
 EXPOSE $PORT
 

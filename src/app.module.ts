@@ -10,7 +10,7 @@ import { EnhancedLoggingService } from './logger/logger.service';
 import { AlbumsModule } from './album/album.module';
 import { ArtistModule } from './artist/artist.module';
 import { AuthModule } from './auth/auth.module';
-import { FavoritesModule } from './favorite/favorite.module';
+import { FavoriteModule } from './favorite/favorite.module';
 import { LoggerModule } from './logger/logger.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { TrackModule } from './track/track.module';
@@ -19,23 +19,26 @@ import { HttpRequestLoggerMiddleware } from './utils/middlewares/httpRequestLogg
 import { CoreModule } from './utils/modules/coreModule';
 import { CustomHttpExceptionFilter } from './utils/handlers/filter/customHttpException.filter';
 
-
-
 @Module({
   imports: [
     CoreModule,
     UserModule,
     AlbumsModule,
     ArtistModule,
-    FavoritesModule,
+    FavoriteModule,
     TrackModule,
     PrismaModule,
     LoggerModule,
+    AuthModule,
   ],
   providers: [
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
+    },
+    {
+      provide: APP_FILTER,
+      useClass: CustomHttpExceptionFilter,
     },
     EnhancedLoggingService,
   ],

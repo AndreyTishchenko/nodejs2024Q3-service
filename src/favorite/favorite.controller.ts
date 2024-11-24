@@ -30,7 +30,7 @@ export class FavoriteController {
   @HttpCode(204)
   async remove(
     @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
-    @Param('type')  type: 'artist' | 'album' | 'track',
+    @Param('type') type: 'artist' | 'album' | 'track',
   ) {
     return await this.favoriteService.removeType(id, type);
   }
