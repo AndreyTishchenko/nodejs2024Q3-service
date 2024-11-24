@@ -1,17 +1,25 @@
 import 'reflect-metadata'; // добавьте эту строку
 import { NestFactory } from '@nestjs/core/nest-factory';
-import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common/pipes/validation.pipe';
-import { INestApplication } from '@nestjs/common';
+import { EnhancedLoggingService } from './logger/logger.service';
+import { setupGlobalExceptionHandlers } from './utils/handlers/setupGlobalExceptionHandlers';
+import { setupSwagger } from './swagger/swaggerConfig';
 
 const defaultPort = 4000;
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    cors: true,
+    bufferLogs: true,
+  });
+  const logger = await app.resolve(EnhancedLoggingService);
+  app.useLogger(logger);
+
   app.useGlobalPipes(new ValidationPipe());
 
-  // await setupSwagger(app);
+  await setupSwagger(app);
+  setupGlobalExceptionHandlers(logger);
 
   const PORT = process.env.PORT || defaultPort;
   await app.listen(PORT, () =>
