@@ -1,6 +1,9 @@
 services:
   data-base-pg:
     image: andreytishchenko/nodejs2024q3-service_data-base-pg:latest
+    build:
+      context: ./db
+      dockerfile: Dockerfile
     ports:
       - '$DATA_BASE_PORT:$DATA_BASE_PORT'
     container_name: 'data-base-PG'
@@ -22,6 +25,9 @@ services:
 
   app:
     image: andreytishchenko/nodejs2024q3-service_app:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: "app"
     ports:
       - '$PORT:$PORT'
