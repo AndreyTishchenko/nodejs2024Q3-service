@@ -8,7 +8,7 @@
 ## Downloading
 
 ```
-git clone {repository URL}
+git clone https://github.com/AndreyTishchenko/nodejs2024Q3-service.git
 ```
 
 ## Installing NPM modules
@@ -17,11 +17,19 @@ git clone {repository URL}
 npm install
 ```
 
-## Running application
+## Build and Start docker containers
 
 ```
-npm start
+docker-compose up --download
 ```
+If after this step app doesnt work try to input
+
+```
+docker-compose up
+```
+
+## Create .env file
+    copy .env.example and change name on .env
 
 After starting the app on port (4000 as default) you can open
 in your browser OpenAPI documentation by typing http://localhost:4000/doc/.
